@@ -8,9 +8,7 @@ ThemeData lightTheme = ThemeData(
   scaffoldBackgroundColor: AppColors.whiteColor,
   colorScheme: const ColorScheme.light(primary: AppColors.primaryColor),
   brightness: Brightness.light,
-
   useMaterial3: true,
-  inputDecorationTheme: SharedTheme.inputDecorationTheme,
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

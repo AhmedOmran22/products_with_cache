@@ -43,8 +43,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Theme and Cache App Demo"),
-        actions: [const ThemeSwitcher()],
+        title: Text(
+          "Theme and Cache App Demo",
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        actions: [const ThemeSwitcher(), const SizedBox(width: 20)],
       ),
       body: BlocBuilder<ProductCubit, ProductState>(
         builder: (context, state) {

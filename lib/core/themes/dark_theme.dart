@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 
 ThemeData darkTheme = ThemeData(
+  scaffoldBackgroundColor: const Color(0xFF1E1E1E),
   splashFactory: NoSplash.splashFactory,
   colorScheme: const ColorScheme.dark(primary: AppColors.primaryColor),
   brightness: Brightness.dark,
   useMaterial3: true,
-  inputDecorationTheme: SharedTheme.inputDecorationTheme,
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
