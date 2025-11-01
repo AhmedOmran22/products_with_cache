@@ -1,6 +1,6 @@
 import '../../data/models/product_model.dart';
 
-enum ProductsState { loading, success, failure }
+enum ProductsState { loading, success, failure, paginationLoading }
 
 class ProductState {
   final List<ProductModel>? products;
