@@ -12,9 +12,12 @@ class ProductsRepoImpl implements ProductsRepo {
   ProductsRepoImpl({required this.remoteDataSource});
 
   @override
-  Future<Either<Failure, List<ProductModel>>> getProducts() async {
+  Future<Either<Failure, List<ProductModel>>> getProducts({
+    int skip = 0,
+    int limit = 10,
+  }) async {
     try {
-      final response = await remoteDataSource.getProducts();
+      final response = await remoteDataSource.getProducts(skip: skip, limit: limit);
       return Right(response);
     } on CustomException catch (e) {
       return Left(ServerFailure(errMessage: e.message));

@@ -8,7 +8,28 @@ class ProductCubit extends Cubit<ProductState> implements PaginationHelper {
 
   ProductCubit(this.productsRepo) : super(const ProductState());
 
-  Future<void> getProducts() async {
+  Future<void> getProducts({int skip = 0, int limit = 10}) async {
+    emit(state.copyWith(productsState: ProductsState.loading));
+
+    final result = await productsRepo.getProducts(skip: skip, limit: limit);
+    result.fold(
+      (failure) => emit(
+        state.copyWith(
+          errMessage: failure.errMessage,
+          productsState: ProductsState.failure,
+        ),
+      ),
+      (products) => emit(
+        state.copyWith(
+          products: products,
+          productsState: ProductsState.success,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Future<void> pagination() async {
     emit(state.copyWith(productsState: ProductsState.loading));
 
     final result = await productsRepo.getProducts();
@@ -27,9 +48,6 @@ class ProductCubit extends Cubit<ProductState> implements PaginationHelper {
       ),
     );
   }
-
-  @override
-  Future<void> pagination() async {}
 
   @override
   bool isPaginationFinished = false;

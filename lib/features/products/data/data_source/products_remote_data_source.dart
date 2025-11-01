@@ -7,8 +7,11 @@ class ProductsRemoteDataSource {
 
   ProductsRemoteDataSource({required this.apiService});
 
-  Future<List<ProductModel>> getProducts() async {
-    final response = await apiService.get(EndPoints.products);
+  Future<List<ProductModel>> getProducts({int skip = 0, int limit = 10}) async {
+    final response = await apiService.get(
+      EndPoints.products,
+      queryParameters: {"skip": skip, "limit": limit},
+    );
     final List productsJson = response["products"];
     return productsJson.map((e) => ProductModel.fromJson(e)).toList();
   }
