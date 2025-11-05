@@ -1,17 +1,49 @@
+import 'package:hive/hive.dart';
+
+part 'product_model.g.dart';
+
+@HiveType(typeId: 0)
 class ProductModel {
+  @HiveField(0)
   final int id;
+
+  @HiveField(1)
   final String title;
+
+  @HiveField(2)
   final String description;
+
+  @HiveField(3)
   final num price;
+
+  @HiveField(4)
   final num discountPercentage;
+
+  @HiveField(5)
   final num rating;
+
+  @HiveField(6)
   final num stock;
+
+  @HiveField(7)
   final String brand;
+
+  @HiveField(8)
   final String category;
+
+  @HiveField(9)
   final String thumbnail;
+
+  @HiveField(10)
   final List<String> images;
+
+  @HiveField(11)
   final String availabilityStatus;
+
+  @HiveField(12)
   final String warrantyInformation;
+
+  @HiveField(13)
   final String returnPolicy;
 
   ProductModel({
@@ -43,13 +75,13 @@ class ProductModel {
       brand: json['brand'] ?? '',
       category: json['category'] ?? '',
       thumbnail: json['thumbnail'] ?? '',
-      images:
-          (json['images'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      images: (json['images'] as List?)?.map((e) => e.toString()).toList() ?? [],
       availabilityStatus: json['availabilityStatus'] ?? '',
       warrantyInformation: json['warrantyInformation'] ?? '',
       returnPolicy: json['returnPolicy'] ?? '',
     );
   }
+
   static final fakeProduct = ProductModel(
     id: 193,
     title: "Watch Gold for Women",
