@@ -23,28 +23,20 @@ class ProductsDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🖼️ Image Carousel
             ProductImageCarousel(product: product),
-
             const SizedBox(height: 16),
-
-            // 📦 Product Info Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 🏷️ Title
                   Text(
                     product.title,
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
                   const SizedBox(height: 8),
-
-                  // ⭐ Rating & Brand Chips
                   Wrap(
                     spacing: 12,
                     runSpacing: 8,
@@ -76,13 +68,8 @@ class ProductsDetailsScreen extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 16),
-
-                  // 💰 Price Section
                   ProductPriceCard(product: product),
-
                   const SizedBox(height: 16),
-
-                  // � Description
                   ProductInfoCard(
                     title: 'Description',
                     icon: Icons.description,
@@ -94,25 +81,18 @@ class ProductsDetailsScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 12),
-
-                  // 📊 Stock & Availability
                   ProductInfoCard(
                     title: 'Availability',
                     icon: Icons.inventory_2,
                     child: ProductAvailabilitySection(product: product),
                   ),
-
                   const SizedBox(height: 12),
-
-                  // 🛡️ Warranty & Return Policy
                   ProductInfoCard(
                     title: 'Warranty & Returns',
                     icon: Icons.verified_user,
                     child: ProductWarrantySection(product: product),
                   ),
-
                   const SizedBox(height: 24),
                 ],
               ),
