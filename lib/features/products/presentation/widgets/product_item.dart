@@ -13,7 +13,7 @@ class ProductItem extends StatelessWidget {
     final theme = Theme.of(context);
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, AppRoutes.productsDetails);
+        Navigator.pushNamed(context, AppRoutes.productsDetails, arguments: product);
       },
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
