@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../features/products/data/repos/products_repo.dart';
+import '../../features/products/presentation/screens/products_details_screen.dart';
 import '../../features/products/presentation/screens/products_screen.dart';
 import '../../features/products/presentation/cubits/products_cubit.dart';
 import '../services/setup_service_locator.dart';
@@ -16,6 +17,11 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
               ProductCubit(getIt.get<ProductsRepo>())..getProducts(),
           child: const ProductsScreen(),
         ),
+      );
+    case AppRoutes.productsDetails:
+      return MaterialPageRoute(
+        settings: settings,
+        builder: (context) => const ProductsDetailsScreen(),
       );
 
     default:
