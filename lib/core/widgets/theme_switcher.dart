@@ -17,7 +17,7 @@ class _ThemeSwitcherState extends State<ThemeSwitcher> {
   Widget build(BuildContext context) {
     return Switch(
       inactiveThumbColor: Colors.grey,
-      activeThumbColor : Theme.of(context).primaryColor,
+      activeColor: Theme.of(context).primaryColor,
       activeTrackColor: Colors.grey.shade700,
       value: Prefs.getBool(kIsDarkMode),
       onChanged: (value) {
