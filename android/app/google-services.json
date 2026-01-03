@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "590956228106",
+    "project_id": "chache-theme-task",
+    "storage_bucket": "chache-theme-task.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:590956228106:android:474d4a3abde16e136379f3",
+        "android_client_info": {
+          "package_name": "com.example.cache_and_theme_task_mentorship"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDO1FTdBxSgwAs3-mWTFVwAW1fhPgqzdUQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
