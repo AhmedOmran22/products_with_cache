@@ -26,13 +26,13 @@ class ProductsRepoImpl implements ProductsRepo {
       }
       return Right(response);
     } on CustomException catch (e) {
-      // If API call fails, try to get from cache
-      final cachedProducts = await localDataSource.getProducts();
-      if (cachedProducts.isNotEmpty) {
-        return Right(cachedProducts);
-      }
-      // If no cached data, return the original error
       return Left(ServerFailure(errMessage: e.message));
     }
+  }
+
+  @override
+  Future<List<ProductModel>> getLocalProducts() async {
+    final cachedProducts = await localDataSource.getProducts();
+    return cachedProducts;
   }
 }
