@@ -49,47 +49,50 @@ class _ProductsScreenState extends State<ProductsScreen> {
         ),
         actions: [const ThemeSwitcher(), const SizedBox(width: 20)],
       ),
-      body: BlocListener<ProductCubit, ProductState>(
-        listener: (context, state) {
-          if (state.errMessage != null) {
-            final cubit = context.read<ProductCubit>();
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.errMessage!),
-                action: SnackBarAction(
-                  label: 'Retry',
-                  onPressed: () {
-                    if (state.isPaginationError) {
-                      cubit.pagination();
-                    } else if (state.isInitialError) {
-                      cubit.getProducts();
-                    }
-                  },
+      body: SafeArea(
+        bottom: true,
+        child: BlocListener<ProductCubit, ProductState>(
+          listener: (context, state) {
+            if (state.errMessage != null) {
+              final cubit = context.read<ProductCubit>();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errMessage!),
+                  action: SnackBarAction(
+                    label: 'Retry',
+                    onPressed: () {
+                      if (state.isPaginationError) {
+                        cubit.pagination();
+                      } else if (state.isInitialError) {
+                        cubit.getProducts();
+                      }
+                    },
+                  ),
                 ),
-              ),
-            );
-            // Clear errors after showing snackbar so it doesn't show again on rebuild
-            cubit.clearErrors();
-          }
-        },
-        child: BlocBuilder<ProductCubit, ProductState>(
-          builder: (context, state) {
-            if (state.productsState == ProductsState.loading) {
-              return const LoadingProductsList();
-            }
-            if ((state.productsState == ProductsState.success ||
-                    state.productsState == ProductsState.paginationLoading) &&
-                state.products != null) {
-              return LoadedProductsList(
-                scrollController: _scrollController,
-                products: state.products!,
               );
+              // Clear errors after showing snackbar so it doesn't show again on rebuild
+              cubit.clearErrors();
             }
-            if (state.productsState == ProductsState.failure) {
-              return Center(child: Text(state.errMessage ?? 'Unknown error'));
-            }
-            return const SizedBox.shrink();
           },
+          child: BlocBuilder<ProductCubit, ProductState>(
+            builder: (context, state) {
+              if (state.productsState == ProductsState.loading) {
+                return const LoadingProductsList();
+              }
+              if ((state.productsState == ProductsState.success ||
+                      state.productsState == ProductsState.paginationLoading) &&
+                  state.products != null) {
+                return LoadedProductsList(
+                  scrollController: _scrollController,
+                  products: state.products!,
+                );
+              }
+              if (state.productsState == ProductsState.failure) {
+                return Center(child: Text(state.errMessage ?? 'Unknown error'));
+              }
+              return const SizedBox.shrink();
+            },
+          ),
         ),
       ),
     );
