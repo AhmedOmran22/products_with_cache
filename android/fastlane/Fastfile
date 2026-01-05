@@ -8,8 +8,8 @@ platform :android do
     firebase_app_distribution(
     app: "1:590956228106:android:474d4a3abde16e136379f3",
     apk_path: "../build/app/outputs/apk/release/app-release.apk",
-    testers: "mamdouhanahamada@gmail.com",
-    release_notes: "first firebase distribution",
+    testers: "mamdouhanahamada@gmail.com , mohamed.egypt140@gmail.com",
+    release_notes: "new release to Muhammed Amr",
     firebase_cli_token: ENV["FIREBASE_TOKEN"]
   )
   end
