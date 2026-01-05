@@ -28,7 +28,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
     if (_scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent - 200 &&
         !cubit.isPaginationStarted &&
-        !cubit.isPaginationFinished) {
+        !cubit.isPaginationFinished &&
+        !cubit.state.isPaginationError) {
       cubit.pagination();
     }
   }
@@ -53,7 +54,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         bottom: true,
         child: BlocListener<ProductCubit, ProductState>(
           listener: (context, state) {
-            if (state.errMessage != null) {
+            if (state.errMessage != null && state.isInitialError) {
               final cubit = context.read<ProductCubit>();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -61,11 +62,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   action: SnackBarAction(
                     label: 'Retry',
                     onPressed: () {
-                      if (state.isPaginationError) {
-                        cubit.pagination();
-                      } else if (state.isInitialError) {
-                        cubit.getProducts();
-                      }
+                      cubit.getProducts();
                     },
                   ),
                 ),
