@@ -1,11 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../data/repos/products_repo.dart';
+import '../../domain/repos/products_repo.dart';
+import '../../domain/use_case/get_products_use_case.dart';
 import 'products_state.dart';
 
 class ProductCubit extends Cubit<ProductState> {
+  final GetProductsUseCase getProductsUseCase;
   final ProductsRepo productsRepo;
 
-  ProductCubit(this.productsRepo) : super(const ProductState());
+  ProductCubit({required this.getProductsUseCase, required this.productsRepo})
+    : super(const ProductState());
 
   int limit = 10;
   int skip = 0;
@@ -33,10 +36,7 @@ class ProductCubit extends Cubit<ProductState> {
       }
     }
 
-    final result = await productsRepo.getProducts(
-      skip: currentSkip,
-      limit: currentLimit,
-    );
+    final result = await getProductsUseCase(skip: currentSkip, limit: currentLimit);
 
     result.fold(
       (failure) {
@@ -94,7 +94,7 @@ class ProductCubit extends Cubit<ProductState> {
       ),
     );
 
-    final result = await productsRepo.getProducts(skip: skip + limit, limit: limit);
+    final result = await getProductsUseCase(skip: skip + limit, limit: limit);
 
     result.fold(
       (failure) {

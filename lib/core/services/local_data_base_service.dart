@@ -6,14 +6,12 @@ class LocalDataBaseService {
     final box = await Hive.openBox<T>(boxName);
     await box.clear(); // Clear old data
     await box.addAll(data);
-    await box.close();
   }
 
   /// Get data from box by name
   Future<List<T>> getData<T>(String boxName) async {
     final box = await Hive.openBox<T>(boxName);
     final data = box.values.toList();
-    await box.close();
     return data;
   }
 
@@ -21,6 +19,5 @@ class LocalDataBaseService {
   Future<void> clearBox(String boxName) async {
     final box = await Hive.openBox(boxName);
     await box.clear();
-    await box.close();
   }
 }

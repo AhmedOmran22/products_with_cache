@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../data/models/product_model.dart';
+import '../../domain/entities/product_entity.dart';
 
 class ProductWarrantySection extends StatelessWidget {
-  final ProductModel product;
+  final ProductEntity product;
 
   const ProductWarrantySection({super.key, required this.product});
 

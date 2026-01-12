@@ -3,7 +3,9 @@ import 'package:get_it/get_it.dart';
 
 import '../../features/products/data/data_source/product_local_data_source.dart';
 import '../../features/products/data/data_source/products_remote_data_source.dart';
-import '../../features/products/data/repos/products_repo.dart';
+import '../../features/products/domain/repos/products_repo.dart';
+import '../../features/products/domain/use_case/get_products_use_case.dart';
+import '../../features/products/domain/use_case/sort_products_use_case.dart';
 import '../../features/products/data/repos/products_repo_impl.dart';
 import 'api_service.dart';
 import 'dio_consumer.dart';
@@ -26,4 +28,8 @@ void setupServiceLocator() {
       localDataSource: getIt<ProductsLocalDataSource>(),
     ),
   );
+  getIt.registerSingleton<GetProductsUseCase>(
+    GetProductsUseCase(getIt<ProductsRepo>()),
+  );
+  getIt.registerSingleton<SortProductsUseCase>(SortProductsUseCase());
 }

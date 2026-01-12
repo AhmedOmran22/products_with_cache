@@ -1,13 +1,12 @@
 import 'package:dartz/dartz.dart';
-
 import '../../../../core/errors/failure.dart';
-import '../models/product_model.dart';
+import '../entities/product_entity.dart';
 
 abstract class ProductsRepo {
-  Future<Either<Failure, List<ProductModel>>> getProducts({
+  Future<Either<Failure, List<ProductEntity>>> getProducts({
     int skip = 0,
     int limit = 10,
   });
 
-  Future<List<ProductModel>> getLocalProducts();
+  Future<List<ProductEntity>> getLocalProducts();
 }

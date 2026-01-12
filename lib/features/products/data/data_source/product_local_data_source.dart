@@ -7,13 +7,13 @@ class ProductsLocalDataSource {
 
   ProductsLocalDataSource({required this.localDataBaseService});
   Future<List<ProductModel>> getProducts({int skip = 0, int limit = 10}) async {
-    final productsList = localDataBaseService.getData<ProductModel>(
+    final productsList = await localDataBaseService.getData<ProductModel>(
       "cached_products",
     );
     return productsList;
   }
 
-  void saveProductsToCache({required List<ProductModel> products}) async {
+  Future<void> saveProductsToCache({required List<ProductModel> products}) async {
     await localDataBaseService.saveData('cached_products', products);
   }
 }

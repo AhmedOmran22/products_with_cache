@@ -1,3 +1,4 @@
+import 'package:cache_and_theme_task_mentorship/core/routes/app_routes.dart';
 import 'package:cache_and_theme_task_mentorship/core/widgets/theme_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -48,7 +49,23 @@ class _ProductsScreenState extends State<ProductsScreen> {
           "Theme and Cache App Demo",
           style: Theme.of(context).textTheme.bodyLarge,
         ),
-        actions: [const ThemeSwitcher(), const SizedBox(width: 20)],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.sort),
+            onPressed: () {
+              final products = context.read<ProductCubit>().state.products;
+              if (products != null) {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.filterProducts,
+                  arguments: products,
+                );
+              }
+            },
+          ),
+          const ThemeSwitcher(),
+          const SizedBox(width: 20),
+        ],
       ),
       body: SafeArea(
         bottom: true,

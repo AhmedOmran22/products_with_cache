@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -16,7 +15,7 @@ class LoadingProductsList extends StatelessWidget {
       itemBuilder: (context, index) {
         return Skeletonizer(
           enabled: true,
-          child: ProductItem(product: ProductModel.fakeProduct),
+          child: ProductItem(product: ProductModel.fakeProduct.toEntity()),
         );
       },
     );

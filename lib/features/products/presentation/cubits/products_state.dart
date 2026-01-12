@@ -1,9 +1,9 @@
-import '../../data/models/product_model.dart';
+import '../../domain/entities/product_entity.dart';
 
 enum ProductsState { loading, success, failure, paginationLoading }
 
 class ProductState {
-  final List<ProductModel>? products;
+  final List<ProductEntity>? products;
   final String? errMessage;
   final ProductsState productsState;
   final bool isPaginationError;
@@ -18,7 +18,7 @@ class ProductState {
   });
 
   ProductState copyWith({
-    List<ProductModel>? products,
+    List<ProductEntity>? products,
     String? errMessage,
     ProductsState? productsState,
     bool? isPaginationError,

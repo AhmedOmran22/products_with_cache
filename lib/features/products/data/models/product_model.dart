@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import '../../domain/entities/product_entity.dart';
 
 part 'product_model.g.dart';
 
@@ -62,6 +63,23 @@ class ProductModel {
     required this.warrantyInformation,
     required this.returnPolicy,
   });
+
+  ProductEntity toEntity() => ProductEntity(
+    id: id,
+    title: title,
+    description: description,
+    price: price,
+    discountPercentage: discountPercentage,
+    rating: rating,
+    stock: stock,
+    brand: brand,
+    category: category,
+    thumbnail: thumbnail,
+    images: images,
+    availabilityStatus: availabilityStatus,
+    warrantyInformation: warrantyInformation,
+    returnPolicy: returnPolicy,
+  );
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../data/models/product_model.dart';
+import '../../domain/entities/product_entity.dart';
 import '../widgets/product_image_carousel.dart';
 import '../widgets/product_rating_chip.dart';
 import '../widgets/product_price_card.dart';
@@ -14,7 +14,7 @@ class ProductsDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final product = ModalRoute.of(context)!.settings.arguments as ProductModel;
+    final product = ModalRoute.of(context)!.settings.arguments as ProductEntity;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../data/models/product_model.dart';
+import '../../domain/entities/product_entity.dart';
 
 class ProductImageCarousel extends StatefulWidget {
-  final ProductModel product;
+  final ProductEntity product;
 
   const ProductImageCarousel({super.key, required this.product});
 
