@@ -54,21 +54,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
         bottom: true,
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                onChanged: (value) {
-                  context.read<ProductCubit>().filterProducts(value);
-                },
-                decoration: InputDecoration(
-                  hintText: 'Search products...',
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ),
             Expanded(
               child: BlocListener<ProductCubit, ProductState>(
                 listener: (context, state) {
@@ -95,7 +80,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       return const LoadingProductsList();
                     }
                     if ((state.productsState == ProductsState.success ||
-                            state.productsState == ProductsState.paginationLoading) &&
+                            state.productsState ==
+                                ProductsState.paginationLoading) &&
                         state.filteredProducts != null) {
                       if (state.filteredProducts!.isEmpty) {
                         return const Center(child: Text('No products found'));
@@ -106,7 +92,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
                       );
                     }
                     if (state.productsState == ProductsState.failure) {
-                      return Center(child: Text(state.errMessage ?? 'Unknown error'));
+                      return Center(
+                        child: Text(state.errMessage ?? 'Unknown error'),
+                      );
                     }
                     return const SizedBox.shrink();
                   },
