@@ -52,44 +52,68 @@ class _ProductsScreenState extends State<ProductsScreen> {
       ),
       body: SafeArea(
         bottom: true,
-        child: BlocListener<ProductCubit, ProductState>(
-          listener: (context, state) {
-            if (state.errMessage != null && state.isInitialError) {
-              final cubit = context.read<ProductCubit>();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errMessage!),
-                  action: SnackBarAction(
-                    label: 'Retry',
-                    onPressed: () {
-                      cubit.getProducts();
-                    },
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextField(
+                onChanged: (value) {
+                  context.read<ProductCubit>().filterProducts(value);
+                },
+                decoration: InputDecoration(
+                  hintText: 'Search products...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-              );
-              // Clear errors after showing snackbar so it doesn't show again on rebuild
-              cubit.clearErrors();
-            }
-          },
-          child: BlocBuilder<ProductCubit, ProductState>(
-            builder: (context, state) {
-              if (state.productsState == ProductsState.loading) {
-                return const LoadingProductsList();
-              }
-              if ((state.productsState == ProductsState.success ||
-                      state.productsState == ProductsState.paginationLoading) &&
-                  state.products != null) {
-                return LoadedProductsList(
-                  scrollController: _scrollController,
-                  products: state.products!,
-                );
-              }
-              if (state.productsState == ProductsState.failure) {
-                return Center(child: Text(state.errMessage ?? 'Unknown error'));
-              }
-              return const SizedBox.shrink();
-            },
-          ),
+              ),
+            ),
+            Expanded(
+              child: BlocListener<ProductCubit, ProductState>(
+                listener: (context, state) {
+                  if (state.errMessage != null && state.isInitialError) {
+                    final cubit = context.read<ProductCubit>();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.errMessage!),
+                        action: SnackBarAction(
+                          label: 'Retry',
+                          onPressed: () {
+                            cubit.getProducts();
+                          },
+                        ),
+                      ),
+                    );
+                    // Clear errors after showing snackbar so it doesn't show again on rebuild
+                    cubit.clearErrors();
+                  }
+                },
+                child: BlocBuilder<ProductCubit, ProductState>(
+                  builder: (context, state) {
+                    if (state.productsState == ProductsState.loading) {
+                      return const LoadingProductsList();
+                    }
+                    if ((state.productsState == ProductsState.success ||
+                            state.productsState == ProductsState.paginationLoading) &&
+                        state.filteredProducts != null) {
+                      if (state.filteredProducts!.isEmpty) {
+                        return const Center(child: Text('No products found'));
+                      }
+                      return LoadedProductsList(
+                        scrollController: _scrollController,
+                        products: state.filteredProducts!,
+                      );
+                    }
+                    if (state.productsState == ProductsState.failure) {
+                      return Center(child: Text(state.errMessage ?? 'Unknown error'));
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

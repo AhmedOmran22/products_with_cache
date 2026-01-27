@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../data/models/product_model.dart';
 import '../../data/repos/products_repo.dart';
 import 'products_state.dart';
 
@@ -16,8 +17,15 @@ class ProductCubit extends Cubit<ProductState> {
   Future<void> getProducts({int? skip, int? limit}) async {
     emit(state.copyWith(productsState: ProductsState.loading));
 
-    final currentSkip = skip ?? this.skip;
+    final currentSkip = skip ?? 0;
     final currentLimit = limit ?? this.limit;
+
+    if (currentSkip == 0) {
+      this.skip = 0;
+      isPaginationFinished = false;
+      isPaginationStarted = false;
+    }
+
     bool hasLocalData = false;
 
     if (currentSkip == 0) {
@@ -27,6 +35,7 @@ class ProductCubit extends Cubit<ProductState> {
         emit(
           state.copyWith(
             products: localProducts,
+            filteredProducts: _filterList(localProducts, state.searchQuery),
             productsState: ProductsState.success,
           ),
         );
@@ -68,6 +77,7 @@ class ProductCubit extends Cubit<ProductState> {
         emit(
           state.copyWith(
             products: products,
+            filteredProducts: _filterList(products, state.searchQuery),
             productsState: ProductsState.success,
             errMessage: null,
             isInitialError: false,
@@ -76,6 +86,20 @@ class ProductCubit extends Cubit<ProductState> {
         );
       },
     );
+  }
+
+  void filterProducts(String query) {
+    final filtered = _filterList(state.products ?? [], query);
+    emit(state.copyWith(searchQuery: query, filteredProducts: filtered));
+  }
+
+  List<ProductModel> _filterList(List<ProductModel> products, String query) {
+    if (query.isEmpty) return products;
+    return products
+        .where(
+          (product) => (product.title).toLowerCase().contains(query.toLowerCase()),
+        )
+        .toList();
   }
 
   void clearErrors() {
@@ -127,6 +151,7 @@ class ProductCubit extends Cubit<ProductState> {
         emit(
           state.copyWith(
             products: allProducts,
+            filteredProducts: _filterList(allProducts, state.searchQuery),
             productsState: ProductsState.success,
             errMessage: null,
             isPaginationError: false,

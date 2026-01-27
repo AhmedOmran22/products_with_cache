@@ -19,20 +19,35 @@ class ProductsRepoImpl implements ProductsRepo {
     try {
       // Try to fetch from API first
       final response = await remoteDataSource.getProducts(skip: skip, limit: limit);
-      // Only save the first 10 products to cache
-      if (skip == 0) {
-        final productsToCache = response.take(10).toList();
-        localDataSource.saveProductsToCache(products: productsToCache);
-      }
+      
+      // Save all fetched products to cache
+      await localDataSource.saveProductsToCache(
+        products: response,
+        clear: skip == 0, // Clear cache only on the first page to refresh data
+      );
+      
       return Right(response);
     } on CustomException catch (e) {
+      // Fallback to local data if remote fails
+      final localProducts = await localDataSource.getProducts(skip: skip, limit: limit);
+      if (localProducts.isNotEmpty) {
+        return Right(localProducts);
+      }
       return Left(ServerFailure(errMessage: e.message));
+    } catch (e) {
+      // General error fallback
+      final localProducts = await localDataSource.getProducts(skip: skip, limit: limit);
+      if (localProducts.isNotEmpty) {
+        return Right(localProducts);
+      }
+      return Left(ServerFailure(errMessage: e.toString()));
     }
   }
 
   @override
   Future<List<ProductModel>> getLocalProducts() async {
-    final cachedProducts = await localDataSource.getProducts();
+    // Return the first page of local products for initial display
+    final cachedProducts = await localDataSource.getProducts(skip: 0, limit: 10);
     return cachedProducts;
   }
 }
