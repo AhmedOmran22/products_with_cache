@@ -24,7 +24,7 @@ lib/
 │   ├── constants/               # API endpoints and app constants
 │   ├── errors/                  # Failure & Exception models
 │   ├── routes/                  # Named route definitions
-│   ├── services/                # API (Dio) & local DB (SQLite) services
+│   ├── services/                # API (Dio) & local DB (Hive) services
 │   ├── theme_cubit/             # Theme state management
 │   ├── themes/                  # Light and dark ThemeData
 │   └── widgets/                 # Shared reusable widgets (e.g. ThemeSwitcher)
@@ -32,7 +32,7 @@ lib/
 └── features/
     └── products/
         ├── data/
-        │   ├── data_source/     # Remote (Dio) & Local (SQLite) data sources
+        │   ├── data_source/     # Remote (Dio) & Local (Hive) data sources
         │   ├── models/          # ProductModel with fromJson / toJson / toMap
         │   └── repos/           # Repository interface + implementation
         └── presentation/
@@ -49,22 +49,22 @@ The app implements a **cache-first** then **network-update** pattern:
 
 1. **On app start**, the cubit calls `getLocalProducts()` to immediately show any previously cached data — making the UI feel instant, even with no internet.
 2. **Then**, it fires the remote API request.
-3. **On API success** — new data is shown and saved to the local SQLite database.
+3. **On API success** — new data is shown and saved to the local Hive database.
 4. **On API failure** — if cached data is already shown, a snackbar is displayed so the user knows the data may be stale. If there's no cached data at all, an error screen is shown with a retry button.
 
 ```
 App starts
     ↓
-[1] Load from SQLite cache → show in UI instantly
+[1] Load from Hive cache → show in UI instantly
     ↓
 [2] Fetch from API (Dio)
     ↓
-    ├── ✅ Success → update UI + save to SQLite cache
+    ├── ✅ Success → update UI + save to Hive cache
     └── ❌ Failure → keep cached data + show snackbar with retry
 ```
 
 **Key files:**
-- `ProductsLocalDataSource` — reads/writes from local SQLite
+- `ProductsLocalDataSource` — reads/writes from local Hive database using `LocalDataBaseService`
 - `ProductsRemoteDataSource` — fetches from the remote API via Dio
 - `ProductsRepoImpl` — orchestrates the cache-first logic
 - `ProductCubit.getProducts()` — drives the UI state updates
@@ -109,11 +109,12 @@ This approach is powerful because:
 |---|---|
 | `flutter_bloc` | State management (Cubit) |
 | `dio` | HTTP networking |
-| `sqflite` | Local SQLite caching |
+| `hive` / `hive_flutter` | Fast, lightweight local NoSQL database caching |
 | `skeletonizer` | Skeleton loading placeholders |
 | `shared_preferences` | Persisting theme preference |
 | `dartz` | Functional `Either` type for error handling |
 | `get_it` | Service locator / dependency injection |
+| `cached_network_image` | Caching and rendering network images |
 
 ---
 
