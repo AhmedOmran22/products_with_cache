@@ -82,13 +82,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     if ((state.productsState == ProductsState.success ||
                             state.productsState ==
                                 ProductsState.paginationLoading) &&
-                        state.filteredProducts != null) {
-                      if (state.filteredProducts!.isEmpty) {
+                        state.products != null) {
+                      if (state.products!.isEmpty) {
                         return const Center(child: Text('No products found'));
                       }
                       return LoadedProductsList(
                         scrollController: _scrollController,
-                        products: state.filteredProducts!,
+                        products: state.products!,
                       );
                     }
                     if (state.productsState == ProductsState.failure) {
