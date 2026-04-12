@@ -1,6 +1,6 @@
 import 'package:cache_and_theme_task_mentorship/core/errors/exception.dart';
 import 'package:cache_and_theme_task_mentorship/features/products/data/data_source/product_local_data_source.dart';
-import 'package:cache_and_theme_task_mentorship/features/products/data/repos/products_repo.dart';
+import 'package:cache_and_theme_task_mentorship/features/products/domain/repos/products_repo.dart';
 import 'package:dartz/dartz.dart';
 import '../../../../core/errors/failure.dart';
 import '../data_source/products_remote_data_source.dart';

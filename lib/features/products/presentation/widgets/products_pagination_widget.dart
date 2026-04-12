@@ -11,6 +11,7 @@ class ProductsPaginationWidget extends StatelessWidget {
     return BlocBuilder<ProductCubit, ProductState>(
       builder: (context, state) {
         final cubit = context.read<ProductCubit>();
+
         if (cubit.isPaginationFinished) {
           return const Padding(
             padding: EdgeInsets.symmetric(vertical: 20),
@@ -21,30 +22,30 @@ class ProductsPaginationWidget extends StatelessWidget {
               ),
             ),
           );
-        } else if (state.isPaginationError) {
+        }
+
+        if (state case ProductsSuccess(isPaginationError: true, :final errMessage)) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),
             child: Column(
               children: [
                 Text(
-                  state.errMessage ?? "Check your internet connection",
+                  errMessage ?? "Check your internet connection",
                   style: const TextStyle(color: Colors.red),
                 ),
                 TextButton(
-                  onPressed: () {
-                    cubit.pagination();
-                  },
+                  onPressed: () => cubit.pagination(),
                   child: const Text("Retry"),
                 ),
               ],
             ),
           );
-        } else {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 20),
-            child: Center(child: CircularProgressIndicator()),
-          );
         }
+
+        return const Padding(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          child: Center(child: CircularProgressIndicator()),
+        );
       },
     );
   }

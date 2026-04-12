@@ -1,45 +1,35 @@
 import '../../data/models/product_model.dart';
 
-enum ProductsState { loading, success, failure, paginationLoading }
+sealed class ProductState {
+  const ProductState();
+}
 
-class ProductState {
-  final List<ProductModel>? products;
-  final String? errMessage;
-  final ProductsState productsState;
+final class ProductsLoading extends ProductState {
+  const ProductsLoading();
+}
+
+final class ProductsSuccess extends ProductState {
+  final List<ProductModel> products;
   final bool isPaginationError;
   final bool isInitialError;
+  final String? errMessage;
 
-  const ProductState({
-    this.products,
-    this.errMessage,
-    this.productsState = ProductsState.loading,
+  const ProductsSuccess({
+    required this.products,
     this.isPaginationError = false,
     this.isInitialError = false,
+    this.errMessage,
   });
+}
 
-  ProductState copyWith({
-    List<ProductModel>? products,
-    String? errMessage,
-    ProductsState? productsState,
-    bool? isPaginationError,
-    bool? isInitialError,
-  }) {
-    return ProductState(
-      products: products ?? this.products,
-      errMessage: errMessage ?? this.errMessage,
-      productsState: productsState ?? this.productsState,
-      isPaginationError: isPaginationError ?? this.isPaginationError,
-      isInitialError: isInitialError ?? this.isInitialError,
-    );
-  }
+final class ProductsPaginationLoading extends ProductState {
+  final List<ProductModel> products;
 
-  ProductState resetErrorStates() {
-    return ProductState(
-      products: products,
-      productsState: productsState,
-      errMessage: null,
-      isPaginationError: false,
-      isInitialError: false,
-    );
-  }
+  const ProductsPaginationLoading({required this.products});
+}
+
+final class ProductsFailure extends ProductState {
+  final String errMessage;
+
+  const ProductsFailure({required this.errMessage});
 }

@@ -19,17 +19,19 @@ class _ProductsScreenState extends State<ProductsScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<ProductCubit>().getProducts();
     _scrollController.addListener(_onScroll);
   }
 
   void _onScroll() {
     final cubit = context.read<ProductCubit>();
+    final state = cubit.state;
+    final isPaginationError = state is ProductsSuccess && state.isPaginationError;
+
     if (_scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent - 200 &&
         !cubit.isPaginationStarted &&
         !cubit.isPaginationFinished &&
-        !cubit.state.isPaginationError) {
+        !isPaginationError) {
       cubit.pagination();
     }
   }
@@ -57,46 +59,39 @@ class _ProductsScreenState extends State<ProductsScreen> {
             Expanded(
               child: BlocListener<ProductCubit, ProductState>(
                 listener: (context, state) {
-                  if (state.errMessage != null && state.isInitialError) {
+                  if (state case ProductsSuccess(
+                    isInitialError: true,
+                    :final errMessage,
+                  )) {
                     final cubit = context.read<ProductCubit>();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(state.errMessage!),
+                        content: Text(errMessage ?? 'An error occurred'),
                         action: SnackBarAction(
                           label: 'Retry',
-                          onPressed: () {
-                            cubit.getProducts();
-                          },
+                          onPressed: () => cubit.getProducts(),
                         ),
                       ),
                     );
-                    // Clear errors after showing snackbar so it doesn't show again on rebuild
                     cubit.clearErrors();
                   }
                 },
                 child: BlocBuilder<ProductCubit, ProductState>(
                   builder: (context, state) {
-                    if (state.productsState == ProductsState.loading) {
-                      return const LoadingProductsList();
-                    }
-                    if ((state.productsState == ProductsState.success ||
-                            state.productsState ==
-                                ProductsState.paginationLoading) &&
-                        state.products != null) {
-                      if (state.products!.isEmpty) {
-                        return const Center(child: Text('No products found'));
-                      }
-                      return LoadedProductsList(
-                        scrollController: _scrollController,
-                        products: state.products!,
-                      );
-                    }
-                    if (state.productsState == ProductsState.failure) {
-                      return Center(
-                        child: Text(state.errMessage ?? 'Unknown error'),
-                      );
-                    }
-                    return const SizedBox.shrink();
+                    return switch (state) {
+                      ProductsLoading() => const LoadingProductsList(),
+                      ProductsSuccess(:final products) ||
+                      ProductsPaginationLoading(:final products) =>
+                        products.isEmpty
+                            ? const Center(child: Text('No products found'))
+                            : LoadedProductsList(
+                                scrollController: _scrollController,
+                                products: products,
+                              ),
+                      ProductsFailure(:final errMessage) => Center(
+                        child: Text(errMessage),
+                      ),
+                    };
                   },
                 ),
               ),

@@ -1,11 +1,18 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../data/repos/products_repo.dart';
+
+import '../../data/models/product_model.dart';
+import '../../domain/usecases/get_local_products_use_case.dart';
+import '../../domain/usecases/get_products_use_case.dart';
 import 'products_state.dart';
 
 class ProductCubit extends Cubit<ProductState> {
-  final ProductsRepo productsRepo;
+  final GetProductsUseCase getProductsUseCase;
+  final GetLocalProductsUseCase getLocalProductsUseCase;
 
-  ProductCubit(this.productsRepo) : super(const ProductState());
+  ProductCubit({
+    required this.getProductsUseCase,
+    required this.getLocalProductsUseCase,
+  }) : super(const ProductsLoading());
 
   int limit = 10;
   int skip = 0;
@@ -13,8 +20,14 @@ class ProductCubit extends Cubit<ProductState> {
   bool isPaginationFinished = false;
   bool isPaginationStarted = false;
 
+  List<ProductModel>? get _currentProducts => switch (state) {
+    ProductsSuccess(:final products) => products,
+    ProductsPaginationLoading(:final products) => products,
+    _ => null,
+  };
+
   Future<void> getProducts({int? skip, int? limit}) async {
-    emit(state.copyWith(productsState: ProductsState.loading));
+    emit(const ProductsLoading());
 
     final currentSkip = skip ?? 0;
     final currentLimit = limit ?? this.limit;
@@ -28,90 +41,64 @@ class ProductCubit extends Cubit<ProductState> {
     bool hasLocalData = false;
 
     if (currentSkip == 0) {
-      final localProducts = await productsRepo.getLocalProducts();
+      final localProducts = await getLocalProductsUseCase();
       if (localProducts.isNotEmpty) {
         hasLocalData = true;
-        emit(
-          state.copyWith(
-            products: localProducts,
-            productsState: ProductsState.success,
-          ),
-        );
+        emit(ProductsSuccess(products: localProducts));
       }
     }
 
-    final result = await productsRepo.getProducts(
-      skip: currentSkip,
-      limit: currentLimit,
-    );
+    final result = await getProductsUseCase(skip: currentSkip, limit: currentLimit);
 
     result.fold(
       (failure) {
         if (hasLocalData) {
+          final current = _currentProducts ?? [];
           emit(
-            state.copyWith(
-              errMessage: failure.errMessage,
-              productsState: ProductsState.success,
+            ProductsSuccess(
+              products: current,
               isInitialError: true,
-              isPaginationError: false,
+              errMessage: failure.errMessage,
             ),
           );
         } else {
-          emit(
-            state.copyWith(
-              errMessage: failure.errMessage,
-              productsState: ProductsState.failure,
-              isInitialError: true,
-              isPaginationError: false,
-            ),
-          );
+          emit(ProductsFailure(errMessage: failure.errMessage));
         }
       },
       (products) {
         if (products.isEmpty || products.length < currentLimit) {
           isPaginationFinished = true;
         }
-
-        emit(
-          state.copyWith(
-            products: products,
-            productsState: ProductsState.success,
-            errMessage: null,
-            isInitialError: false,
-            isPaginationError: false,
-          ),
-        );
+        emit(ProductsSuccess(products: products));
       },
     );
   }
 
   void clearErrors() {
-    emit(state.resetErrorStates());
+    if (state case ProductsSuccess(:final products)) {
+      emit(ProductsSuccess(products: products));
+    }
   }
 
   Future<void> pagination() async {
     if (isPaginationStarted || isPaginationFinished) return;
 
-    isPaginationStarted = true;
-    emit(
-      state.copyWith(
-        productsState: ProductsState.paginationLoading,
-        isPaginationError: false,
-        isInitialError: false,
-      ),
-    );
+    final currentProducts = _currentProducts;
+    if (currentProducts == null) return;
 
-    final result = await productsRepo.getProducts(skip: skip + limit, limit: limit);
+    isPaginationStarted = true;
+    emit(ProductsPaginationLoading(products: currentProducts));
+
+    final result = await getProductsUseCase(skip: skip + limit, limit: limit);
 
     result.fold(
       (failure) {
         isPaginationStarted = false;
         emit(
-          state.copyWith(
-            errMessage: failure.errMessage,
-            productsState: ProductsState.success,
+          ProductsSuccess(
+            products: currentProducts,
             isPaginationError: true,
-            isInitialError: false,
+            errMessage: failure.errMessage,
           ),
         );
       },
@@ -121,25 +108,16 @@ class ProductCubit extends Cubit<ProductState> {
 
         if (newProducts.isEmpty) {
           isPaginationFinished = true;
-          emit(state.copyWith(productsState: ProductsState.success));
+          emit(ProductsSuccess(products: currentProducts));
           return;
         }
 
-        final allProducts = [...state.products!, ...newProducts];
-
+        final allProducts = [...currentProducts, ...newProducts];
         if (newProducts.length < limit) {
           isPaginationFinished = true;
         }
 
-        emit(
-          state.copyWith(
-            products: allProducts,
-            productsState: ProductsState.success,
-            errMessage: null,
-            isPaginationError: false,
-            isInitialError: false,
-          ),
-        );
+        emit(ProductsSuccess(products: allProducts));
       },
     );
   }
