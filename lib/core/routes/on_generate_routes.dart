@@ -2,7 +2,6 @@ import 'package:cache_and_theme_task_mentorship/core/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../features/products/domain/usecases/get_local_products_use_case.dart';
 import '../../features/products/domain/usecases/get_products_use_case.dart';
 import '../../features/products/presentation/screens/products_details_screen.dart';
 import '../../features/products/presentation/screens/products_screen.dart';
@@ -16,7 +15,6 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
         builder: (context) => BlocProvider(
           create: (context) => ProductCubit(
             getProductsUseCase: getIt.get<GetProductsUseCase>(),
-            getLocalProductsUseCase: getIt.get<GetLocalProductsUseCase>(),
           )..getProducts(),
           child: const ProductsScreen(),
         ),

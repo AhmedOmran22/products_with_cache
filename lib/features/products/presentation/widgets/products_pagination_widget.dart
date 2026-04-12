@@ -10,14 +10,12 @@ class ProductsPaginationWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ProductCubit, ProductState>(
       builder: (context, state) {
-        final cubit = context.read<ProductCubit>();
-
-        if (cubit.isPaginationFinished) {
+        if (state case ProductsSuccess(isPaginationFinished: true)) {
           return const Padding(
             padding: EdgeInsets.symmetric(vertical: 20),
             child: Center(
               child: Text(
-                "No more products 👌",
+                "No more products",
                 style: TextStyle(color: Colors.grey),
               ),
             ),
@@ -34,7 +32,7 @@ class ProductsPaginationWidget extends StatelessWidget {
                   style: const TextStyle(color: Colors.red),
                 ),
                 TextButton(
-                  onPressed: () => cubit.pagination(),
+                  onPressed: () => context.read<ProductCubit>().pagination(),
                   child: const Text("Retry"),
                 ),
               ],
@@ -42,6 +40,7 @@ class ProductsPaginationWidget extends StatelessWidget {
           );
         }
 
+        // Shown during both initial skeleton load and pagination loading.
         return const Padding(
           padding: EdgeInsets.symmetric(vertical: 20),
           child: Center(child: CircularProgressIndicator()),

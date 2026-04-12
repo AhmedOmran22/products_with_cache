@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../data/models/product_model.dart';
+import '../../domain/entities/product_entity.dart';
 import 'product_item.dart';
 import 'products_pagination_widget.dart';
 
@@ -12,7 +12,7 @@ class LoadedProductsList extends StatelessWidget {
   });
 
   final ScrollController scrollController;
-  final List<ProductModel> products;
+  final List<ProductEntity> products;
 
   @override
   Widget build(BuildContext context) {

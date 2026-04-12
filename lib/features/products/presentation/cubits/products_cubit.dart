@@ -1,124 +1,107 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../data/models/product_model.dart';
-import '../../domain/usecases/get_local_products_use_case.dart';
 import '../../domain/usecases/get_products_use_case.dart';
 import 'products_state.dart';
 
 class ProductCubit extends Cubit<ProductState> {
   final GetProductsUseCase getProductsUseCase;
-  final GetLocalProductsUseCase getLocalProductsUseCase;
+  final int pageSize;
 
   ProductCubit({
     required this.getProductsUseCase,
-    required this.getLocalProductsUseCase,
+    this.pageSize = 10,
   }) : super(const ProductsLoading());
 
-  int limit = 10;
-  int skip = 0;
+  // ── Helpers ──────────────────────────────────────────────────────────────
 
-  bool isPaginationFinished = false;
-  bool isPaginationStarted = false;
+  /// Returns the current product list if the state carries one; null otherwise.
+  ProductsSuccess? get _successState =>
+      state is ProductsSuccess ? state as ProductsSuccess : null;
 
-  List<ProductModel>? get _currentProducts => switch (state) {
-    ProductsSuccess(:final products) => products,
-    ProductsPaginationLoading(:final products) => products,
-    _ => null,
-  };
+  // ── Public API ───────────────────────────────────────────────────────────
 
-  Future<void> getProducts({int? skip, int? limit}) async {
+  /// Initial (or refresh) load.
+  ///
+  /// Consumes the Stream from the use case, which may emit up to two events:
+  ///   • A cached snapshot first (instant display, stale-while-revalidate)
+  ///   • Fresh remote data (or a failure) when the network call resolves
+  Future<void> getProducts() async {
     emit(const ProductsLoading());
 
-    final currentSkip = skip ?? 0;
-    final currentLimit = limit ?? this.limit;
+    await for (final result in getProductsUseCase(skip: 0, limit: pageSize)) {
+      if (isClosed) return;
 
-    if (currentSkip == 0) {
-      this.skip = 0;
-      isPaginationFinished = false;
-      isPaginationStarted = false;
-    }
-
-    bool hasLocalData = false;
-
-    if (currentSkip == 0) {
-      final localProducts = await getLocalProductsUseCase();
-      if (localProducts.isNotEmpty) {
-        hasLocalData = true;
-        emit(ProductsSuccess(products: localProducts));
-      }
-    }
-
-    final result = await getProductsUseCase(skip: currentSkip, limit: currentLimit);
-
-    result.fold(
-      (failure) {
-        if (hasLocalData) {
-          final current = _currentProducts ?? [];
-          emit(
-            ProductsSuccess(
-              products: current,
+      result.fold(
+        (failure) {
+          final current = _successState;
+          if (current != null) {
+            // Already showing cached data — add an error banner, keep the list.
+            emit(current.copyWith(
               isInitialError: true,
               errMessage: failure.errMessage,
-            ),
-          );
-        } else {
-          emit(ProductsFailure(errMessage: failure.errMessage));
-        }
-      },
-      (products) {
-        if (products.isEmpty || products.length < currentLimit) {
-          isPaginationFinished = true;
-        }
-        emit(ProductsSuccess(products: products));
-      },
-    );
-  }
-
-  void clearErrors() {
-    if (state case ProductsSuccess(:final products)) {
-      emit(ProductsSuccess(products: products));
+            ));
+          } else {
+            // Nothing to fall back on — hard failure.
+            emit(ProductsFailure(errMessage: failure.errMessage));
+          }
+        },
+        (products) {
+          emit(ProductsSuccess(
+            products: products,
+            isPaginationFinished: products.length < pageSize,
+          ));
+        },
+      );
     }
   }
 
+  /// Load the next page.
+  ///
+  /// All guards live here. The UI just calls this method on scroll — it does
+  /// not need to check any flags itself.
   Future<void> pagination() async {
-    if (isPaginationStarted || isPaginationFinished) return;
+    final current = _successState;
+    if (current == null) return;
+    if (current.isPaginationLoading) return;
+    if (current.isPaginationFinished) return;
+    if (current.isPaginationError) return;
 
-    final currentProducts = _currentProducts;
-    if (currentProducts == null) return;
+    // Derive skip from what we already have — no separate counter to maintain.
+    final skip = current.products.length;
 
-    isPaginationStarted = true;
-    emit(ProductsPaginationLoading(products: currentProducts));
+    emit(current.copyWith(isPaginationLoading: true));
 
-    final result = await getProductsUseCase(skip: skip + limit, limit: limit);
+    await for (final result in getProductsUseCase(skip: skip, limit: pageSize)) {
+      if (isClosed) return;
 
-    result.fold(
-      (failure) {
-        isPaginationStarted = false;
-        emit(
-          ProductsSuccess(
-            products: currentProducts,
+      result.fold(
+        (failure) {
+          // Don't wipe existing products on a pagination error.
+          emit(current.copyWith(
             isPaginationError: true,
             errMessage: failure.errMessage,
-          ),
-        );
-      },
-      (newProducts) {
-        isPaginationStarted = false;
-        skip += limit;
+          ));
+        },
+        (newProducts) {
+          final finished =
+              newProducts.isEmpty || newProducts.length < pageSize;
+          emit(current.copyWith(
+            products: [...current.products, ...newProducts],
+            isPaginationFinished: finished,
+          ));
+        },
+      );
+    }
+  }
 
-        if (newProducts.isEmpty) {
-          isPaginationFinished = true;
-          emit(ProductsSuccess(products: currentProducts));
-          return;
-        }
-
-        final allProducts = [...currentProducts, ...newProducts];
-        if (newProducts.length < limit) {
-          isPaginationFinished = true;
-        }
-
-        emit(ProductsSuccess(products: allProducts));
-      },
-    );
+  /// Clears all error flags while preserving everything else in the state.
+  void clearErrors() {
+    final current = _successState;
+    if (current == null) return;
+    emit(current.copyWith(
+      isPaginationError: false,
+      isInitialError: false,
+      errMessage: null,
+    ));
   }
 }

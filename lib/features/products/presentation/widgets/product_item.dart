@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../../core/routes/app_routes.dart';
-import '../../data/models/product_model.dart';
+import '../../domain/entities/product_entity.dart';
 
 class ProductItem extends StatelessWidget {
-  final ProductModel product;
+  final ProductEntity product;
   const ProductItem({super.key, required this.product});
 
   @override

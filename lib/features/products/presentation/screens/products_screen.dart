@@ -23,16 +23,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
   }
 
   void _onScroll() {
-    final cubit = context.read<ProductCubit>();
-    final state = cubit.state;
-    final isPaginationError = state is ProductsSuccess && state.isPaginationError;
-
     if (_scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent - 200 &&
-        !cubit.isPaginationStarted &&
-        !cubit.isPaginationFinished &&
-        !isPaginationError) {
-      cubit.pagination();
+        _scrollController.position.maxScrollExtent - 200) {
+      context.read<ProductCubit>().pagination();
     }
   }
 
@@ -80,8 +73,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   builder: (context, state) {
                     return switch (state) {
                       ProductsLoading() => const LoadingProductsList(),
-                      ProductsSuccess(:final products) ||
-                      ProductsPaginationLoading(:final products) =>
+                      ProductsSuccess(:final products) =>
                         products.isEmpty
                             ? const Center(child: Text('No products found'))
                             : LoadedProductsList(

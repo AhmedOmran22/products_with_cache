@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-import '../../data/models/product_model.dart';
+import '../../domain/entities/product_entity.dart';
 import 'product_item.dart';
 
 class LoadingProductsList extends StatelessWidget {
@@ -14,9 +14,9 @@ class LoadingProductsList extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       itemCount: 6,
       itemBuilder: (context, index) {
-        return Skeletonizer(
+        return const Skeletonizer(
           enabled: true,
-          child: ProductItem(product: ProductModel.fakeProduct),
+          child: ProductItem(product: ProductEntity.fake),
         );
       },
     );

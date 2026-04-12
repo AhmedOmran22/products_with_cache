@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/errors/failure.dart';
-import '../../data/models/product_model.dart';
+import '../entities/product_entity.dart';
 import '../repos/products_repo.dart';
 
 class GetProductsUseCase {
@@ -9,10 +9,9 @@ class GetProductsUseCase {
 
   GetProductsUseCase(this.productsRepo);
 
-  Future<Either<Failure, List<ProductModel>>> call({
+  Stream<Either<Failure, List<ProductEntity>>> call({
     int skip = 0,
     int limit = 10,
-  }) {
-    return productsRepo.getProducts(skip: skip, limit: limit);
-  }
+  }) =>
+      productsRepo.getProducts(skip: skip, limit: limit);
 }
